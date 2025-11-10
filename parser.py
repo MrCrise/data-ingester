@@ -1,5 +1,5 @@
-import json
 import re
+import json
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -138,15 +138,13 @@ def normalize_id(raw_id):
     # Убираем множественные подчеркивания
     normalized = re.sub(r'_+', '_', normalized)
     
-    # Убираем подчеркивания в начале и конце
     normalized = normalized.strip('_')
     
-    # Приводим к нижнему регистру
     normalized = normalized.lower()
     
     return normalized
 
-def parse_data(driver, start_page=2, last_page=1, step=-1, file_for_cases = 'cases.json', file_for_docs = 'docs.json', mode='w'):
+def parse_data(driver, start_page=2, last_page=1, step=-1):
     """Функция парсит данные из базы ФАС"""
     
     all_cases_data = {
@@ -344,16 +342,12 @@ def parse_data(driver, start_page=2, last_page=1, step=-1, file_for_cases = 'cas
                     })
                 except Exception as e:
                     continue
-            
-    with open(file=file_for_cases, mode=mode, encoding='utf-8') as data_file:
-        json.dump(all_cases_data, data_file, ensure_ascii=False, indent=4)
-        
-    with open(file=file_for_docs, mode=mode, encoding='utf-8') as docs_file:
-        json.dump(documents, docs_file, ensure_ascii=False, indent=4)
         
     driver.close()
+    
+    return all_cases_data, documents
 
-def parse_last_page(driver):
+def parse_page_count(driver):
     """
     Функция возвращает количество страниц на сайте базы решений ФАС
     
@@ -368,6 +362,9 @@ def parse_last_page(driver):
     driver.close()
     return total_text
 
-driver = webdriver.Firefox()
-
-parse_data(driver, start_page=3)
+def save_to_json(cases:dict, documents:dict, file_for_cases = 'cases.json', file_for_docs = 'docs.json', mode='w'):
+    with open(file=file_for_cases, mode=mode, encoding='utf-8') as data_file:
+        json.dump(cases, data_file, ensure_ascii=False, indent=4)
+        
+    with open(file=file_for_docs, mode=mode, encoding='utf-8') as docs_file:
+        json.dump(documents, docs_file, ensure_ascii=False, indent=4)
