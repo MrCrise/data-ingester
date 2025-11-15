@@ -1,6 +1,5 @@
 # Chunker
 A text chunkers repo for FAS-helper project.
-WIP
 
 # Known bugs and issues:
 1. Returning chunks contains indexes of normalized text instead of original text.
