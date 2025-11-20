@@ -34,15 +34,20 @@ def save_to_db(cases_dict: dict, documents_dict: dict, logging = False):
     cases_data = cases_dict['cases']
     documents_data = documents_dict['documents']
     
+    print(f'Number of parsed cases: {len(cases_data)}')
+    
     with engine.begin() as conn:
         # Записываем дело
         for case in cases_data:
             existing_case = conn.execute(
-                cases.select().where(cases.c.text_id == case['case_id'])
+                cases.select().where(cases.c.raw_id == case['raw_id'])
             ).first()
             
             if existing_case:
                 case_id = existing_case.id
+                print(f'Case id {case_id} already exists')
+                print(f'urls: \n{existing_case.url}\n{case['case_url']}')
+                print("   ---")
             else:
                 try:
                     result = conn.execute(

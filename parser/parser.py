@@ -28,10 +28,6 @@ def create_chrome_driver():
 
 def create_firefox_driver():
     """Создает Chrome драйвер с настройками для обхода SSL ошибок"""
-    # options = Options()
-    
-    # options.add_argument('--ignore-certificate-errors')
-    # options.add_argument('--disable-web-security')
     
     driver = webdriver.Firefox()
     
