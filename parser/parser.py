@@ -144,7 +144,7 @@ def normalize_id(raw_id):
     
     return normalized
 
-def parse_data(driver, start_page=2, last_page=1, step=-1):
+def parse_data(driver, start_page=2, last_page=0, step=-1):
     """Функция парсит данные из базы ФАС"""
     
     all_cases_data = {

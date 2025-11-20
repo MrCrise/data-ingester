@@ -5,6 +5,8 @@ from sqlalchemy import create_engine, delete, select, func, MetaData
 from sqlalchemy.exc import DataError
 from dotenv import load_dotenv
 
+DATABASE_URL = "postgresql://raw_storage_admin:1234@localhost:5432/raw_storage"
+
 def convert_to_date(date_str):
     if not date_str:
         return None
@@ -20,7 +22,7 @@ def save_to_db(cases_dict: dict, documents_dict: dict):
     """
     
     load_dotenv()
-    DATABASE_URL = os.environ.get('DATABASE_URL')# .env файл в формате postgresql://user:pass@localhost/mydb
+    DATABASE_URL = "postgresql://raw_storage_admin:1234@localhost:5432/raw_storage" # .env файл в формате postgresql://user:pass@localhost/mydb
     
     engine = create_engine(DATABASE_URL, echo=True)
     metadata = MetaData()
@@ -145,7 +147,6 @@ def clear_all_tables():
 
 def count_cases():
     load_dotenv()
-    DATABASE_URL = os.environ.get('DATABASE_URL')
     engine = create_engine(DATABASE_URL)
     
     metadata = MetaData()
