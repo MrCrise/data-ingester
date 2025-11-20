@@ -5,8 +5,6 @@ from sqlalchemy import create_engine, delete, select, func, MetaData
 from sqlalchemy.exc import DataError
 from dotenv import load_dotenv
 
-DATABASE_URL = "postgresql://raw_storage_admin:1234@localhost:5432/raw_storage"
-
 def convert_to_date(date_str):
     if not date_str:
         return None
@@ -15,16 +13,16 @@ def convert_to_date(date_str):
     except (ValueError, TypeError):
         return None
 
-def save_to_db(cases_dict: dict, documents_dict: dict):
+def save_to_db(cases_dict: dict, documents_dict: dict, logging = False):
     """
     Функция принимает словари с делами и связанными документами и 
     записывает их в уже созданную базу данных
     """
     
     load_dotenv()
-    DATABASE_URL = "postgresql://raw_storage_admin:1234@localhost:5432/raw_storage" # .env файл в формате postgresql://user:pass@localhost/mydb
+    DATABASE_URL = os.environ.get('DATABASE_URL')# .env файл в формате postgresql://user:pass@localhost/mydb
     
-    engine = create_engine(DATABASE_URL, echo=True)
+    engine = create_engine(DATABASE_URL, echo=logging)
     metadata = MetaData()
     metadata.reflect(bind=engine)
 
@@ -103,14 +101,14 @@ def save_to_db(cases_dict: dict, documents_dict: dict):
                                 participant_role=participant['role']
                             ))
                 except DataError:
-                    print(f'DataError - {case}')
+                    print(f'DataError - {case['raw_id']}')
 
         # Записываем связанные дела
         for doc in documents_data:
             existing_document = conn.execute(
                 documents.select().where(documents.c.doc_id == doc['document_id'])  # ← participants.select()
             ).first()
-            
+            #Тут же вызывать метод чанкера и эмбедера
             if not existing_document:
                 case_result = conn.execute(
                     cases.select().where(cases.c.text_id == doc['case_id'])
@@ -139,7 +137,6 @@ def clear_all_tables():
     metadata.reflect(bind=engine)
     
     with engine.begin() as conn:
-        # Важен порядок из-за foreign keys!
         conn.execute(delete(metadata.tables['case_participant']))
         conn.execute(delete(metadata.tables['documents']))
         conn.execute(delete(metadata.tables['participants']))
@@ -147,6 +144,7 @@ def clear_all_tables():
 
 def count_cases():
     load_dotenv()
+    DATABASE_URL = os.environ.get('DATABASE_URL')
     engine = create_engine(DATABASE_URL)
     
     metadata = MetaData()

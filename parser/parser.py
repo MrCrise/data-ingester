@@ -1,9 +1,41 @@
 import re
 import json
+import math
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
+
+def create_chrome_driver():
+    """Создает Chrome драйвер с настройками для обхода SSL ошибок"""
+    options = Options()
+    
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--disable-web-security')
+    
+    options.add_argument('--disable-javascript')  # ускоряет в 3-5 раз!
+    options.add_argument('--blink-settings=imagesEnabled=false')
+    options.add_argument('--disable-extensions')
+    options.add_argument('--no-sandbox')
+    
+    # Блокировка конкретных медленных доменов
+    options.add_argument('--host-resolver-rules=MAP stat.sputnik.ru 127.0.0.1, MAP www.google-analytics.com 127.0.0.1, MAP mc.yandex.ru 127.0.0.1')
+    
+    driver = webdriver.Chrome(options=options)
+    
+    return driver
+
+def create_firefox_driver():
+    """Создает Chrome драйвер с настройками для обхода SSL ошибок"""
+    # options = Options()
+    
+    # options.add_argument('--ignore-certificate-errors')
+    # options.add_argument('--disable-web-security')
+    
+    driver = webdriver.Firefox()
+    
+    return driver
 
 def normalize_date(date_str):
     """Нормализует дату в ISO формат"""
@@ -144,7 +176,7 @@ def normalize_id(raw_id):
     
     return normalized
 
-def parse_data(driver, start_page=2, last_page=0, step=-1):
+def parse_data(driver, start_page=2, last_page=1, step=-1):
     """Функция парсит данные из базы ФАС"""
     
     all_cases_data = {
@@ -152,7 +184,7 @@ def parse_data(driver, start_page=2, last_page=0, step=-1):
     }
     documents = {'documents': []}
     for page in range(start_page, last_page, step):
-        driver.get(f"https://br.fas.gov.ru/?page={page}&")
+        driver.get(f"https://br.fas.gov.ru/?page={page}&")    
         
         cases_on_page = driver.find_elements(By.CSS_SELECTOR, "a[href*='/cases/']")
         cases_urls = [case.get_attribute('href') for case in cases_on_page]
@@ -342,14 +374,12 @@ def parse_data(driver, start_page=2, last_page=0, step=-1):
                     })
                 except Exception as e:
                     continue
-        
-    driver.close()
-    
+            
     return all_cases_data, documents
 
-def parse_page_count(driver):
+def parse_pages_count(driver):
     """
-    Функция возвращает количество страниц на сайте базы решений ФАС
+    Функция возвращает количество страниц со списками дел на сайте базы решений ФАС
     
     Args:
         driver (webdriver): драйвер с помощью которого осуществляется парсинг
@@ -362,9 +392,41 @@ def parse_page_count(driver):
     driver.close()
     return total_text
 
+def parse_count_of_cases_from_first_page(driver):
+    """
+    Функция возвращает количество дел с первой страницы базы решений ФАС
+    
+    Args:
+        driver (webdriver): драйвер с помощью которого осуществляется парсинг
+    """
+    driver.get('https://br.fas.gov.ru/')
+    
+    cases_on_page = driver.find_elements(By.CSS_SELECTOR, "a[href*='/cases/']")
+    count_of_cases = len(cases_on_page)
+
+    return count_of_cases
+
 def save_to_json(cases:dict, documents:dict, file_for_cases = 'cases.json', file_for_docs = 'docs.json', mode='w'):
     with open(file=file_for_cases, mode=mode, encoding='utf-8') as data_file:
         json.dump(cases, data_file, ensure_ascii=False, indent=4)
         
     with open(file=file_for_docs, mode=mode, encoding='utf-8') as docs_file:
         json.dump(documents, docs_file, ensure_ascii=False, indent=4)
+        
+def count_new_pages(pages_count:int, count_of_cases:int, count_of_cases_at_first_page:int):
+    """Функция возвращает количество не спарщенных страниц.
+
+    Args:
+        pages_count (int): Количество страниц с названиями дел на сайте (на одной странице до 10 дел)
+        count_or_cases (int): Количество дел в базе
+        count_of_cases_at_first_page:int Количество дел на первой странцице
+    """
+    COUNT_CASES_AT_LAST_PAGE = 3
+    MAX_COUNT_CASES_AT_PAGE = 10
+    FIRST_AND_LAST_PAGES = 2
+    
+    count_new_pages = math.ceil(((pages_count - FIRST_AND_LAST_PAGES) * MAX_COUNT_CASES_AT_PAGE 
+                                 + COUNT_CASES_AT_LAST_PAGE + count_of_cases_at_first_page 
+                                 - count_of_cases)/10)
+    
+    return count_new_pages
