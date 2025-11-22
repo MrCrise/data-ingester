@@ -1,5 +1,5 @@
 # Ingester
-Repo that provides text chunkers, embedders and vector storage data saving.
+Repo that provides parser, text chunkers, embedders and vector storage data saving.
 
 # Known bugs and issues:
 1. Returning chunks contains indexes of normalized text instead of original text.
