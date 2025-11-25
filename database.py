@@ -12,7 +12,7 @@ def load_database_url():
     return DATABASE_URL
 
 
-def create_engine(database_url, logging):
+def create_db_engine(database_url, logging):
     engine = create_engine(database_url, echo=logging)
     return engine
 
