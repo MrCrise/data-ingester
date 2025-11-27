@@ -121,6 +121,11 @@ def save_to_db(case: dict, linked_documents: list, engine, metadata):
 
             if existing_document:
                 print(f"Document {doc['document_id']} already exists")
+                try:
+                    linked_documents.remove(doc)
+                except ValueError as e:
+                    print(
+                        f"Error while removing existing document {doc['document_id']} from saving list: {e}")
             else:
                 try:
                     conn.execute(
@@ -144,7 +149,7 @@ def save_to_db(case: dict, linked_documents: list, engine, metadata):
 
 def update_document_qdrant_status(doc_id: str, success: bool, version: str, engine, metadata):
     documents = metadata.tables['documents']
-    
+
     with engine.begin() as conn:
         conn.execute(
             documents.update()
@@ -158,19 +163,19 @@ def update_document_qdrant_status(doc_id: str, success: bool, version: str, engi
 
 def get_document_text_by_id(doc_id: str, engine, metadata):
     documents = metadata.tables['documents']
-    
+
     try:
         with engine.begin() as conn:
             document = conn.execute(
                 documents.select().where(documents.c.doc_id == doc_id)
             ).first()
-        
+
         if not document or not document.full_text:
             print(f"Document {doc_id} not found or has no text")
             return None
-            
+
         return document.full_text
-        
+
     except Exception as e:
         print(f"Error text getting by ID: {doc_id}: {e}")
         return None
