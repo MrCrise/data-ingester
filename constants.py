@@ -2,3 +2,5 @@ TOKENIZER_NAME = "BAAI/bge-m3"
 EMBEDDING_MODEL = "BAAI/bge-m3"
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
 EMBEDDER_VER = "1.0"
+
+QDRANT_COLLECTION_NAME = "legal_rag"

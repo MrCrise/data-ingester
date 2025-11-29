@@ -155,27 +155,6 @@ def update_document_qdrant_status(doc_id: str, success: bool, version: str, engi
             )
         )
 
-
-def get_document_text_by_id(doc_id: str, engine, metadata):
-    documents = metadata.tables['documents']
-    
-    try:
-        with engine.begin() as conn:
-            document = conn.execute(
-                documents.select().where(documents.c.doc_id == doc_id)
-            ).first()
-        
-        if not document or not document.full_text:
-            print(f"Document {doc_id} not found or has no text")
-            return None
-            
-        return document.full_text
-        
-    except Exception as e:
-        print(f"Error text getting by ID: {doc_id}: {e}")
-        return None
-
-
 def clear_all_tables(engine, metadata):
     with engine.begin() as conn:
         conn.execute(delete(metadata.tables['case_participant']))
