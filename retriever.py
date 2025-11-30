@@ -96,7 +96,7 @@ class AsyncRetriever:
                 unique_docs[doc_id] = {
                     "doc_id": doc_id,
                     "score": point.score,
-                    "title": payload.get("title", ""),
+                    # "title": payload.get("title", ""),
                     "best_chunk": payload.get("text", ""),
                     "full_text": None
                 }
