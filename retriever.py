@@ -41,6 +41,9 @@ class AsyncRetriever:
         )
 
     async def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Ищет релевантные документы по запросу.
+        """
 
         loop = asyncio.get_running_loop()
         query_embedding = await loop.run_in_executor(

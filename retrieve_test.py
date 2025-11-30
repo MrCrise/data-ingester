@@ -18,10 +18,10 @@ async def main():
     retriever = AsyncRetriever(client, model, doc_fetcher)
 
     try:
-        query = "какой штраф за нарушение закона о рекламе"
+        query = "Установление дискриминационных условий в договоре поставки"
         print(f"Searching for: {query}...")
 
-        results = await retriever.search(query, limit=3)
+        results = await retriever.search(query, limit=5)
 
         for res in results:
             print(f"\n--- Doc: {res['doc_id']} (Score: {res['score']:.3f}) ---")
