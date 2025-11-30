@@ -37,8 +37,8 @@ if __name__ == '__main__':
 
         metadata = create_metadata(engine)
 
-        clear_all_tables(engine, metadata)
-        parse_data(driver, chunker, embedder, engine, metadata, start_page=3)
+        # clear_all_tables(engine, metadata)
+        parse_data(driver, chunker, embedder, engine, metadata, start_page=50, last_page=20)
 
         print('-' * 50)
         print(f'Number of cases in the db: {count_cases(engine=engine, metadata=metadata)}')
