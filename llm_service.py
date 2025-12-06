@@ -92,6 +92,7 @@ class AsyncLLMService:
                     "num_ctx": 16384
                 },
                 stream=True,
+                keep_alive="1h"
             )
 
             async for chunk in stream:

@@ -62,20 +62,20 @@ class AsyncRAG:
             print(f"Searching error: {e}")
             return
 
-        search_time = start_time - time.time()
+        search_time = time.time() - start_time
 
         if not search_results:
             print("Docs not found")
 
         print(f"Found {len(search_results)} docs in {search_time} secs")
-        for res in search_results:
-            print(
-                f"\n--- Doc: {res['doc_id']} (Score: {res['score']:.3f}) ---")
-            print(f"Chunk: {res['best_chunk']}...")
-            if res['full_text']:
-                print(f"Full Text preview: {res['full_text'][:100]}...")
-            else:
-                print("Full text not found")
+        # for res in search_results:
+        #     print(
+        #         f"\n--- Doc: {res['doc_id']} (Score: {res['score']:.3f}) ---")
+        #     print(f"Chunk: {res['best_chunk']}...")
+        #     if res['full_text']:
+        #         print(f"Full Text preview: {res['full_text'][:100]}...")
+        #     else:
+        #         print("Full text not found")
 
         print("LLM generation started")
         print("-" * 50)
